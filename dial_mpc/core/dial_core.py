@@ -3,6 +3,9 @@ import time
 from dataclasses import dataclass
 import importlib
 import sys
+import mujoco
+from mujoco import mjx
+import imageio
 
 import yaml
 import argparse
@@ -31,6 +34,8 @@ plt.style.use("science")
 xla_flags = os.environ.get("XLA_FLAGS", "")
 xla_flags += " --xla_gpu_triton_gemm_any=True"
 os.environ["XLA_FLAGS"] = xla_flags
+
+# jax.config.update("jax_disable_jit", True)
 
 
 def rollout_us(step_env, state, us):
@@ -98,7 +103,7 @@ class MBDPI:
         return nodes
 
     @functools.partial(jax.jit, static_argnums=(0,))
-    def reverse_once(self, state, rng, Ybar_i, noise_scale):
+    def reverse_once(self, state, rng, Ybar_i: jax.Array, noise_scale: jax.Array):
         # sample from q_i
         rng, Y0s_rng = jax.random.split(rng)
         eps_Y = jax.random.normal(
@@ -188,6 +193,12 @@ def main():
         default=None,
         help="Custom environment to import dynamically",
     )
+    parser.add_argument(
+        "--video",
+        default=False,
+        action="store_true",
+        help="Record video of rollout",
+    )
     args = parser.parse_args()
 
     if args.list_examples:
@@ -216,6 +227,12 @@ def main():
 
     print(emoji.emojize(":rocket:") + "Creating environment")
     env = brax_envs.get_environment(dial_config.env_name, config=env_config)
+    if args.video:
+        renderer = mujoco.Renderer(env.sys.mj_model)
+        scene_option = mujoco.MjvOption()
+        scene_option.flags[mujoco.mjtVisFlag.mjVIS_JOINT] = True
+        scene_option.flags[mujoco.mjtVisFlag.mjVIS_PERTFORCE] = True
+
     reset_env = jax.jit(env.reset)
     step_env = jax.jit(env.step)
     mbdpi = MBDPI(dial_config, env)
@@ -236,6 +253,7 @@ def main():
     state = state_init
     us = []
     infos = []
+    frames = []
     with tqdm(range(Nstep), desc="Rollout") as pbar:
         for t in pbar:
             # forward single step
@@ -244,6 +262,11 @@ def main():
             rews.append(state.reward)
             us.append(Y0[0])
 
+            if args.video:
+                mjx_data = mjx.get_data(env.sys.mj_model, state.pipeline_state)
+                renderer.update_scene(mjx_data, "track", scene_option=scene_option)
+                frames.append(renderer.render())
+            
             # update Y0
             Y0 = mbdpi.shift(Y0)
 
@@ -266,6 +289,9 @@ def main():
 
     rew = jnp.array(rews).mean()
     print(f"mean reward = {rew:.2e}")
+
+    if args.video:
+        imageio.mimsave("test.mp4", frames, fps=50, format="mp4", codec="libx264")
 
     # save us
     # us = jnp.array(us)
