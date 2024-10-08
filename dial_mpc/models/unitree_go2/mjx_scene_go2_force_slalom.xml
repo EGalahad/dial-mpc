@@ -6,9 +6,9 @@
   </option> -->
 
     <option iterations="2" ls_iterations="5" gravity="0.0 0.0 -9.81">
-        <flag eulerdamp="disable"/>
+        <flag eulerdamp="disable" />
     </option>
-    <!-- <option integrator="RK4" gravity="0.0 0.0 -9.81" iterations="2" ls_iterations="5"/> -->
+    <!-- <option integrator="RK4" gravity="0.0 0.0 -9.81" iterations="4" ls_iterations="5"/> -->
 
     <statistic center="0 0 0.1" extent="0.8"/>
 
@@ -260,10 +260,25 @@
             </body>
         </body>
 
-        <body name="box" pos="1 0 0.2">
-            <geom name="box_geom" type="box" size="0.4 0.3 0.2" rgba="0.8 0.3 0.3 1" friction="0.6 0.005 0.0001"/>
-            <inertial mass="5.0" pos="0 0 0" diaginertia="0.1 0.1 0.1" />
-            <joint name="box_free" type="free"/>
+        <body name="walls" pos="0.0 0.0 0">
+            <geom type="box" size="0.1 1.0 0.5" pos="1.0 -1.0 0.5" rgba="1 0 0 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="2.0 1.0 0.5" rgba="0 0 1 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="3.0 -1.0 0.5" rgba="1 0 0 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="4.0 1.0 0.5" rgba="0 0 1 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="5.0 -1.0 0.5" rgba="1 0 0 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="6.0 1.0 0.5" rgba="0 0 1 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="7.0 -1.0 0.5" rgba="1 0 0 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="8.0 1.0 0.5" rgba="0 0 1 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="9.0 -1.0 0.5" rgba="1 0 0 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="10.0 1.0 0.5" rgba="0 0 1 1" />
+            <geom type="box" size="0.1 1.0 0.5" pos="11.0 -1.0 0.5" rgba="1 0 0 1" />
+        </body>
+
+        <!-- add a visual only body as target position marker -->
+        <body name="target pos marker" pos="0 0 0.25">
+            <geom size="0.2" type="sphere" class="visual"/>
+            <joint axis="1 0 0" name="box:x" type="slide"/>
+            <joint axis="0 1 0" name="box:y" type="slide"/>
         </body>
     </worldbody>
 
@@ -319,7 +334,6 @@
         <key name="home" qpos="
         0 0 0.27 1 0 0 0
         0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8
-        1 0 0.2 1 0 0 0
-         " />
+        1 0.5" />
     </keyframe>
 </mujoco>

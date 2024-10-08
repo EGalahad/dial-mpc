@@ -109,6 +109,7 @@ class MBDPI:
         eps_Y = jax.random.normal(
             Y0s_rng, (self.args.Nsample, self.args.Hnode + 1, self.nu)
         )
+        noise_scale = self.sigma_control * noise_scale
         Y0s = eps_Y * noise_scale[None, :, None] + Ybar_i
         # we can't change the first control
         Y0s = Y0s.at[:, 0].set(Ybar_i[0, :])
@@ -246,6 +247,20 @@ def main():
     # Y0 = mbdpi.reverse(state_init, YN, rng_exp)
     Y0 = YN
 
+    setpoint_pos_b = jnp.array([1.0, 0.0, 0.0])
+    yaw_diff = jnp.array([0.0])
+    kp = jnp.array([6, 6, 6])
+    kd = jnp.array([4, 4, 4])
+    virtual_mass = jnp.array([1.])
+    cmd = jnp.concatenate([
+        setpoint_pos_b[:2],
+        yaw_diff,
+        kp[:2] * setpoint_pos_b[:2],
+        kd,
+        kp[2:] * yaw_diff,
+        virtual_mass,
+    ])
+
     Nstep = dial_config.n_steps
     rews = []
     rews_plan = []
@@ -257,7 +272,8 @@ def main():
     with tqdm(range(Nstep), desc="Rollout") as pbar:
         for t in pbar:
             # forward single step
-            state = step_env(state, Y0[0])
+            # state = step_env(state, Y0[0])
+            state = step_env(state, cmd)
             rollout.append(state.pipeline_state)
             rews.append(state.reward)
             us.append(Y0[0])
