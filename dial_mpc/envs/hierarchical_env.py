@@ -1,12 +1,10 @@
 import mujoco
-from mujoco.mjx import Data
 import jax
 import jax.numpy as jnp
 from functools import partial
 from dataclasses import dataclass
 
 import torch
-from tensordict import TensorDict
 from tensordict.nn import TensorDictModule
 
 from brax import math
@@ -178,7 +176,7 @@ class HierarchicalEnv(BaseEnv):
         R = pipeline_state.x.rot[self._torso_idx - 1]
         projected_gravity = math.inv_rotate(jnp.array([0.0, 0.0, -1.0]), R)
         jpos = pipeline_state.qpos[7:][mjc2isaac]
-        jvel = pipeline_state.qvel[7:][mjc2isaac]
+        jvel = pipeline_state.qvel[6:][mjc2isaac]
         action_buf = state_info["action_buf"]
         obs = jnp.concatenate(
             [
@@ -192,13 +190,22 @@ class HierarchicalEnv(BaseEnv):
         return obs
 
     def _compute_reward(self, pipeline_state: PipelineState, state_info: dict) -> jnp.ndarray:
+        x, xd = pipeline_state.x, pipeline_state.xd
         # reward vel
         vb = math.inv_rotate(
-            pipeline_state.xd.vel[self._torso_idx - 1], pipeline_state.x.rot[self._torso_idx - 1]
+            xd.vel[self._torso_idx - 1], x.rot[self._torso_idx - 1]
         )
         reward_vel = -jnp.sum((vb[:2] - state_info["vel_tar"][:2]) ** 2)
 
-        reward = reward_vel
+        # stay upright reward
+        vec_tar = jnp.array([0.0, 0.0, 1.0])
+        vec = math.rotate(vec_tar, x.rot[0])
+        reward_upright = -jnp.sum(jnp.square(vec - vec_tar))
+
+        reward = (
+            reward_vel * 1.0
+            + reward_upright * 0.5
+        )
 
         return reward
 

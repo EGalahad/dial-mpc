@@ -35,7 +35,7 @@ xla_flags = os.environ.get("XLA_FLAGS", "")
 xla_flags += " --xla_gpu_triton_gemm_any=True"
 os.environ["XLA_FLAGS"] = xla_flags
 
-# jax.config.update("jax_disable_jit", True)
+jax.config.update("jax_disable_jit", True)
 
 
 def rollout_us(step_env, state, us):
