@@ -1,14 +1,11 @@
 # DIAL-MPC
 seed: 0
 output_dir: go2_force
-n_steps: 400
+n_steps: 200
 
 env_name: go2_force
-# Nsample: 128
-# Hsample: 128
-# Hnode: 4
-Nsample: 8
-Hsample: 4
+Nsample: 128
+Hsample: 64
 Hnode: 4
 Ndiffuse: 2
 Ndiffuse_init: 4
@@ -27,6 +24,7 @@ kd: 0.5
 action_scale: 0.5
 
 # Go2
-policy_path: /home/elijah/Documents/Study/projects_ongoing/dial-mpc/policy-go2force-639.pt
+policy_path: /home/elijah/Documents/dial-mpc/policy-go2force-639.pt
 command_size: 10
+command_controllable_size: 2
 action_hist: 3

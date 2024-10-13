@@ -19,9 +19,15 @@
   <worldbody>
     <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
     <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+    <body name="setpoint" pos="0 0 0.27">
+      <joint name="setpoint_x" type="slide" pos="0 0 0.27" axis="1 0 0"/>
+      <joint name="setpoint_y" type="slide" pos="0 0 0.27" axis="0 1 0"/>
+      <geom size="0.1" type="sphere" class="visual"/>
+    </body>
   </worldbody>
 
   <keyframe>
-      <key name="home" qpos="0 0 0.27 1 0 0 0 0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8" />
+      <key name="home" qpos="0 0 0.27 1 0 0 0 0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8
+      0.9 0" />
   </keyframe>
 </mujoco>

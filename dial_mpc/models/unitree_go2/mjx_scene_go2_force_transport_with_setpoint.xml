@@ -1,14 +1,27 @@
-<mujoco model="go2">
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco model="go2 scene">
     <compiler angle="radian" meshdir="assets" autolimits="true" />
-
     <!-- <option cone="pyramidal" impratio="100" iterations="1" ls_iterations="5">
     <flag eulerdamp="disable"/>
   </option> -->
-
     <option iterations="2" ls_iterations="5" gravity="0.0 0.0 -9.81">
         <flag eulerdamp="disable" />
     </option>
-
+    <statistic center="0 0 0.1" extent="0.8" />
+    <visual>
+        <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+        <rgba haze="0.15 0.25 0.35 1" />
+        <global azimuth="-130" elevation="-20" />
+    </visual>
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512"
+            height="3072" />
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
+            rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+        <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5"
+            reflectance="0.2" />
+        <material name="box_material" shininess="0.1" specular="0.5" roughness="0.3" />
+    </asset>
     <default>
         <default class="go2">
             <geom friction="0.6" margin="0.001" condim="1" />
@@ -55,13 +68,11 @@
             </default>
         </default>
     </default>
-
     <asset>
         <material name="metal" rgba=".9 .95 .95 1" />
         <material name="black" rgba="0 0 0 1" />
         <material name="white" rgba="1 1 1 1" />
         <material name="gray" rgba="0.671705 0.692426 0.774270 1" />
-
         <mesh file="base_0.obj" />
         <mesh file="base_1.obj" />
         <mesh file="base_2.obj" />
@@ -79,15 +90,12 @@
         <mesh file="calf_mirror_1.obj" />
         <mesh file="foot.obj" />
     </asset>
-
     <worldbody>
-        <body name="base" pos="0 0 0.445" childclass="go2">
-            <camera name="track" pos="0.846 -1.465 0.916"
-                xyaxes="0.866 0.500 0.000 -0.171 0.296 0.940" mode="trackcom" />
+        <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" />
+        <body name="base_1" pos="-0.5 0 0.5" quat="1 0 0 0" childclass="go2">
             <inertial pos="0.021112 0 -0.005366" quat="-0.000543471 0.713435 -0.00173769 0.700719"
-                mass="6.921"
-                diaginertia="0.107027 0.0980771 0.0244531" />
-            <freejoint />
+                mass="6.921" diaginertia="0.107027 0.0980771 0.0244531" />
+            <joint name="base_free_joint_1" type="free" />
             <geom mesh="base_0" material="black" class="visual" />
             <geom mesh="base_1" material="black" class="visual" />
             <geom mesh="base_2" material="black" class="visual" />
@@ -95,352 +103,346 @@
             <geom mesh="base_4" material="gray" class="visual" />
             <!-- <geom size="0.057 0.04675 0.057" class="collision"/> -->
             <!-- <geom size="0.1881 0.04675 0.057" type="box" class="collision" /> -->
-            <geom size="0.05 0.045" pos="0.285 0 0.01" class="collision"/>
-            <geom size="0.047" pos="0.293 0 -0.06" class="collision"/>
-            <site name="imu" pos="-0.02557 0 0.04232" />
-            <body name="FR_hip" pos="0.1934 -0.0465 0">
+            <!-- <geom size="0.05 0.045" pos="0.285 0 0.01" class="collision"/> -->
+            <!-- <geom size="0.047" pos="0.293 0 -0.06" class="collision"/> -->
+            <geom size="0.01 0.1 0.1" pos="0.33 0 0" type="box" class="collision" />
+            <site name="imu_1" pos="-0.02557 0 0.04232" />
+            <body name="FR_hip_1" pos="0.1934 -0.0465 0">
                 <inertial pos="-0.0054 -0.00194 -0.000105"
                     quat="0.498237 0.505462 0.499245 0.497014" mass="0.678"
                     diaginertia="0.00088403 0.000596003 0.000479967" />
-                <joint name="FR_hip_joint" class="abduction" />
+                <joint name="FR_hip_joint_1" class="abduction" />
                 <geom mesh="hip_0" material="metal" class="visual" quat="4.63268e-05 1 0 0" />
                 <geom mesh="hip_1" material="gray" class="visual" quat="4.63268e-05 1 0 0" />
-                <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
-                    class="collision" />
-                <body name="FR_thigh" pos="0 -0.0955 0">
+                <body name="FR_thigh_1" pos="0 -0.0955 0">
                     <inertial pos="-0.00374 0.0223 -0.0327"
                         quat="0.551623 -0.0200632 0.0847635 0.829533" mass="1.152"
                         diaginertia="0.00594973 0.00584149 0.000878787" />
-                    <joint name="FR_thigh_joint" class="front_hip" />
+                    <joint name="FR_thigh_joint_1" class="front_hip" />
                     <geom mesh="thigh_mirror_0" material="metal" class="visual" />
                     <geom mesh="thigh_mirror_1" material="gray" class="visual" />
-                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
-                        quat="0.707107 0
-                    0.707107 0" class="collision" />
-                    <body name="FR_calf" pos="0 0 -0.213">
+                    <body name="FR_calf_1" pos="0 0 -0.213">
                         <inertial pos="0.00629595 0.000622121 -0.141417"
-                            quat="0.703508 -0.00450087 0.00154099 0.710672"
-                            mass="0.241352" diaginertia="0.0014901 0.00146356 5.31397e-05" />
-                        <joint name="FR_calf_joint" class="knee" />
+                            quat="0.703508 -0.00450087 0.00154099 0.710672" mass="0.241352"
+                            diaginertia="0.0014901 0.00146356 5.31397e-05" />
+                        <joint name="FR_calf_joint_1" class="knee" />
                         <geom mesh="calf_mirror_0" material="gray" class="visual" />
                         <geom mesh="calf_mirror_1" material="black" class="visual" />
-                        <geom size="0.013 0.06" pos="0.01 0 -0.06"
-                            quat="0.995004 0 -0.0998334
-                        0" class="collision" />
-                        <geom size="0.011 0.0325" pos="0.02 0 -0.148"
-                            quat="0.999688 0
-                        0.0249974 0" class="collision" />
+                        <!-- <geom size="0.013 0.06" pos="0.01 0 -0.06" quat="0.995004 0 -0.0998334
+                        0" type="capsule" class="collision"/>
+                        <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0
+                        0.0249974 0" type="capsule" class="collision"/> -->
                         <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
-                        <geom name="FR" class="foot" />
-                        <site name="FR_foot" class="go2foot" />
+                        <geom name="FR_1" class="foot" />
+                        <site name="FR_foot_1" class="go2foot" />
                     </body>
+                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
+                        quat="0.707107 0 0.707107 0" class="collision" />
                 </body>
+                <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
+                    class="collision" />
             </body>
-            <body name="FL_hip" pos="0.1934 0.0465 0">
+            <body name="FL_hip_1" pos="0.1934 0.0465 0">
                 <inertial pos="-0.0054 0.00194 -0.000105" quat="0.497014 0.499245 0.505462 0.498237"
-                    mass="0.678"
-                    diaginertia="0.00088403 0.000596003 0.000479967" />
-                <joint name="FL_hip_joint" class="abduction" />
+                    mass="0.678" diaginertia="0.00088403 0.000596003 0.000479967" />
+                <joint name="FL_hip_joint_1" class="abduction" />
                 <geom mesh="hip_0" material="metal" class="visual" />
                 <geom mesh="hip_1" material="gray" class="visual" />
-                <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0" class="collision"/>
-                <body name="FL_thigh" pos="0 0.0955 0">
+                <body name="FL_thigh_1" pos="0 0.0955 0">
                     <inertial pos="-0.00374 -0.0223 -0.0327"
                         quat="0.829533 0.0847635 -0.0200632 0.551623" mass="1.152"
                         diaginertia="0.00594973 0.00584149 0.000878787" />
-                    <joint name="FL_thigh_joint" class="front_hip" />
+                    <joint name="FL_thigh_joint_1" class="front_hip" />
                     <geom mesh="thigh_0" material="metal" class="visual" />
                     <geom mesh="thigh_1" material="gray" class="visual" />
-                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
-                        quat="0.707107 0
-                    0.707107 0" class="collision" />
-                    <body name="FL_calf" pos="0 0 -0.213">
+                    <body name="FL_calf_1" pos="0 0 -0.213">
                         <inertial pos="0.00629595 -0.000622121 -0.141417"
-                            quat="0.710672 0.00154099 -0.00450087 0.703508"
-                            mass="0.241352" diaginertia="0.0014901 0.00146356 5.31397e-05" />
-                        <joint name="FL_calf_joint" class="knee" />
+                            quat="0.710672 0.00154099 -0.00450087 0.703508" mass="0.241352"
+                            diaginertia="0.0014901 0.00146356 5.31397e-05" />
+                        <joint name="FL_calf_joint_1" class="knee" />
                         <geom mesh="calf_0" material="gray" class="visual" />
                         <geom mesh="calf_1" material="black" class="visual" />
-                        <geom size="0.012 0.06" pos="0.008 0 -0.06"
-                            quat="0.994493 0 -0.104807
-                        0" class="collision" />
-                        <geom size="0.011 0.0325" pos="0.02 0 -0.148"
-                            quat="0.999688 0
-                        0.0249974 0" class="collision" />
                         <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
-                        <geom name="FL" class="foot" />
-                        <site name="FL_foot" class="go2foot" />
+                        <geom name="FL_1" class="foot" />
+                        <site name="FL_foot_1" class="go2foot" />
                     </body>
+                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
+                        quat="0.707107 0 0.707107 0" class="collision" />
                 </body>
+                <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0"
+                    class="collision" />
             </body>
-            <body name="RR_hip" pos="-0.1934 -0.0465 0">
+            <body name="RR_hip_1" pos="-0.1934 -0.0465 0">
                 <inertial pos="0.0054 -0.00194 -0.000105" quat="0.499245 0.497014 0.498237 0.505462"
-                    mass="0.678"
-                    diaginertia="0.00088403 0.000596003 0.000479967" />
-                <joint name="RR_hip_joint" class="abduction" />
+                    mass="0.678" diaginertia="0.00088403 0.000596003 0.000479967" />
+                <joint name="RR_hip_joint_1" class="abduction" />
                 <geom mesh="hip_0" material="metal" class="visual"
                     quat="2.14617e-09 4.63268e-05 4.63268e-05 -1" />
                 <geom mesh="hip_1" material="gray" class="visual"
                     quat="2.14617e-09 4.63268e-05 4.63268e-05 -1" />
-                <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
-                    class="collision" />
-                <body name="RR_thigh" pos="0 -0.0955 0">
+                <body name="RR_thigh_1" pos="0 -0.0955 0">
                     <inertial pos="-0.00374 0.0223 -0.0327"
                         quat="0.551623 -0.0200632 0.0847635 0.829533" mass="1.152"
                         diaginertia="0.00594973 0.00584149 0.000878787" />
-                    <joint name="RR_thigh_joint" class="back_hip" />
+                    <joint name="RR_thigh_joint_1" class="back_hip" />
                     <geom mesh="thigh_mirror_0" material="metal" class="visual" />
                     <geom mesh="thigh_mirror_1" material="gray" class="visual" />
-                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
-                        quat="0.707107 0
-                    0.707107 0" class="collision" />
-                    <body name="RR_calf" pos="0 0 -0.213">
+                    <body name="RR_calf_1" pos="0 0 -0.213">
                         <inertial pos="0.00629595 0.000622121 -0.141417"
-                            quat="0.703508 -0.00450087 0.00154099 0.710672"
-                            mass="0.241352" diaginertia="0.0014901 0.00146356 5.31397e-05" />
-                        <joint name="RR_calf_joint" class="knee" />
+                            quat="0.703508 -0.00450087 0.00154099 0.710672" mass="0.241352"
+                            diaginertia="0.0014901 0.00146356 5.31397e-05" />
+                        <joint name="RR_calf_joint_1" class="knee" />
                         <geom mesh="calf_mirror_0" material="gray" class="visual" />
                         <geom mesh="calf_mirror_1" material="black" class="visual" />
-                        <geom size="0.013 0.06" pos="0.01 0 -0.06"
-                            quat="0.995004 0 -0.0998334
-                        0" class="collision" />
-                        <geom size="0.011 0.0325" pos="0.02 0 -0.148"
-                            quat="0.999688 0
-                        0.0249974 0" class="collision" />
+                        <!-- <geom size="0.013 0.06" pos="0.01 0 -0.06" quat="0.995004 0 -0.0998334
+                        0" type="capsule" class="collision"/>
+                        <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0
+                        0.0249974 0" type="capsule" class="collision"/> -->
                         <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
-                        <geom name="RR" class="foot" />
-                        <site name="RR_foot" class="go2foot" />
+                        <geom name="RR_1" class="foot" />
+                        <site name="RR_foot_1" class="go2foot" />
                     </body>
+                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
+                        quat="0.707107 0 0.707107 0" class="collision" />
                 </body>
+                <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
+                    class="collision" />
             </body>
-            <body name="RL_hip" pos="-0.1934 0.0465 0">
+            <body name="RL_hip_1" pos="-0.1934 0.0465 0">
                 <inertial pos="0.0054 0.00194 -0.000105" quat="0.505462 0.498237 0.497014 0.499245"
-                    mass="0.678"
-                    diaginertia="0.00088403 0.000596003 0.000479967" />
-                <joint name="RL_hip_joint" class="abduction" />
+                    mass="0.678" diaginertia="0.00088403 0.000596003 0.000479967" />
+                <joint name="RL_hip_joint_1" class="abduction" />
                 <geom mesh="hip_0" material="metal" class="visual" quat="4.63268e-05 0 1 0" />
                 <geom mesh="hip_1" material="gray" class="visual" quat="4.63268e-05 0 1 0" />
-                <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0"
-                    class="collision" />
-                <body name="RL_thigh" pos="0 0.0955 0">
+                <!-- <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0"
+                class="collision"/> -->
+                <body name="RL_thigh_1" pos="0 0.0955 0">
                     <inertial pos="-0.00374 -0.0223 -0.0327"
                         quat="0.829533 0.0847635 -0.0200632 0.551623" mass="1.152"
                         diaginertia="0.00594973 0.00584149 0.000878787" />
-                    <joint name="RL_thigh_joint" class="back_hip" />
+                    <joint name="RL_thigh_joint_1" class="back_hip" />
                     <geom mesh="thigh_0" material="metal" class="visual" />
                     <geom mesh="thigh_1" material="gray" class="visual" />
-                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
-                        quat="0.707107 0
-                    0.707107 0" class="collision" />
-                    <body name="RL_calf" pos="0 0 -0.213">
+                    <!-- <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955" quat="0.707107 0
+                    0.707107 0" class="collision"/> -->
+                    <body name="RL_calf_1" pos="0 0 -0.213">
                         <inertial pos="0.00629595 -0.000622121 -0.141417"
-                            quat="0.710672 0.00154099 -0.00450087 0.703508"
-                            mass="0.241352" diaginertia="0.0014901 0.00146356 5.31397e-05" />
-                        <joint name="RL_calf_joint" class="knee" />
+                            quat="0.710672 0.00154099 -0.00450087 0.703508" mass="0.241352"
+                            diaginertia="0.0014901 0.00146356 5.31397e-05" />
+                        <joint name="RL_calf_joint_1" class="knee" />
                         <geom mesh="calf_0" material="gray" class="visual" />
                         <geom mesh="calf_1" material="black" class="visual" />
-                        <geom size="0.013 0.06" pos="0.01 0 -0.06"
-                            quat="0.995004 0 -0.0998334
-                        0" class="collision" />
-                        <geom size="0.011 0.0325" pos="0.02 0 -0.148"
-                            quat="0.999688 0
-                        0.0249974 0" class="collision" />
                         <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
-                        <geom name="RL" class="foot" />
-                        <site name="RL_foot" class="go2foot" />
+                        <geom name="RL_1" class="foot" />
+                        <site name="RL_foot_1" class="go2foot" />
                     </body>
+                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
+                        quat="0.707107 0 0.707107 0" class="collision" />
                 </body>
+                <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0"
+                    class="collision" />
             </body>
         </body>
-        <body name="base" pos="0 0 0.445" childclass="go2">
-            <camera name="track" pos="0.846 -1.465 0.916"
-                xyaxes="0.866 0.500 0.000 -0.171 0.296 0.940" mode="trackcom" />
+        <body name="base_2" pos="0.5 0 0.5" quat="0 0 0 1" childclass="go2">
+            <!-- <camera name="track" pos="0.846 -1.465 0.916"
+                xyaxes="0.866 0.500 0.000 -0.171 0.296 0.940" mode="trackcom" /> -->
             <inertial pos="0.021112 0 -0.005366" quat="-0.000543471 0.713435 -0.00173769 0.700719"
-                mass="6.921"
-                diaginertia="0.107027 0.0980771 0.0244531" />
-            <freejoint />
+                mass="6.921" diaginertia="0.107027 0.0980771 0.0244531" />
+            <joint name="base_free_joint_2" type="free" />
             <geom mesh="base_0" material="black" class="visual" />
             <geom mesh="base_1" material="black" class="visual" />
             <geom mesh="base_2" material="black" class="visual" />
             <geom mesh="base_3" material="white" class="visual" />
             <geom mesh="base_4" material="gray" class="visual" />
+            <geom size="0.01 0.1 0.1" pos="0.33 0 0" type="box" class="collision" />
             <!-- <geom size="0.057 0.04675 0.057" class="collision"/> -->
-            <!-- <geom size="0.1881 0.04675 0.057" type="box" class="collision" /> -->
-            <geom size="0.05 0.045" pos="0.285 0 0.01" class="collision"/>
-            <geom size="0.047" pos="0.293 0 -0.06" class="collision"/>
-            <site name="imu" pos="-0.02557 0 0.04232" />
-            <body name="FR_hip" pos="0.1934 -0.0465 0">
+            <site name="imu_2" pos="-0.02557 0 0.04232" />
+            <body name="FR_hip_2" pos="0.1934 -0.0465 0">
                 <inertial pos="-0.0054 -0.00194 -0.000105"
                     quat="0.498237 0.505462 0.499245 0.497014" mass="0.678"
                     diaginertia="0.00088403 0.000596003 0.000479967" />
-                <joint name="FR_hip_joint" class="abduction" />
+                <joint name="FR_hip_joint_2" class="abduction" />
                 <geom mesh="hip_0" material="metal" class="visual" quat="4.63268e-05 1 0 0" />
                 <geom mesh="hip_1" material="gray" class="visual" quat="4.63268e-05 1 0 0" />
-                <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
-                    class="collision" />
-                <body name="FR_thigh" pos="0 -0.0955 0">
+                <!-- <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
+                class="collision"/> -->
+                <body name="FR_thigh_2" pos="0 -0.0955 0">
                     <inertial pos="-0.00374 0.0223 -0.0327"
                         quat="0.551623 -0.0200632 0.0847635 0.829533" mass="1.152"
                         diaginertia="0.00594973 0.00584149 0.000878787" />
-                    <joint name="FR_thigh_joint" class="front_hip" />
+                    <joint name="FR_thigh_joint_2" class="front_hip" />
                     <geom mesh="thigh_mirror_0" material="metal" class="visual" />
                     <geom mesh="thigh_mirror_1" material="gray" class="visual" />
-                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
-                        quat="0.707107 0
-                    0.707107 0" class="collision" />
-                    <body name="FR_calf" pos="0 0 -0.213">
+                    <!-- <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955" quat="0.707107 0
+                    0.707107 0" class="collision"/> -->
+                    <body name="FR_calf_2" pos="0 0 -0.213">
                         <inertial pos="0.00629595 0.000622121 -0.141417"
-                            quat="0.703508 -0.00450087 0.00154099 0.710672"
-                            mass="0.241352" diaginertia="0.0014901 0.00146356 5.31397e-05" />
-                        <joint name="FR_calf_joint" class="knee" />
+                            quat="0.703508 -0.00450087 0.00154099 0.710672" mass="0.241352"
+                            diaginertia="0.0014901 0.00146356 5.31397e-05" />
+                        <joint name="FR_calf_joint_2" class="knee" />
                         <geom mesh="calf_mirror_0" material="gray" class="visual" />
                         <geom mesh="calf_mirror_1" material="black" class="visual" />
-                        <geom size="0.013 0.06" pos="0.01 0 -0.06"
-                            quat="0.995004 0 -0.0998334
-                        0" class="collision" />
-                        <geom size="0.011 0.0325" pos="0.02 0 -0.148"
-                            quat="0.999688 0
-                        0.0249974 0" class="collision" />
                         <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
-                        <geom name="FR" class="foot" />
-                        <site name="FR_foot" class="go2foot" />
+                        <geom name="FR_2" class="foot" />
+                        <site name="FR_foot_2" class="go2foot" />
                     </body>
+                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
+                        quat="0.707107 0 0.707107 0" class="collision" />
                 </body>
+                <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
+                    class="collision" />
             </body>
-            <body name="FL_hip" pos="0.1934 0.0465 0">
+            <body name="FL_hip_2" pos="0.1934 0.0465 0">
                 <inertial pos="-0.0054 0.00194 -0.000105" quat="0.497014 0.499245 0.505462 0.498237"
-                    mass="0.678"
-                    diaginertia="0.00088403 0.000596003 0.000479967" />
-                <joint name="FL_hip_joint" class="abduction" />
+                    mass="0.678" diaginertia="0.00088403 0.000596003 0.000479967" />
+                <joint name="FL_hip_joint_2" class="abduction" />
                 <geom mesh="hip_0" material="metal" class="visual" />
                 <geom mesh="hip_1" material="gray" class="visual" />
-                <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0" class="collision"/>
-                <body name="FL_thigh" pos="0 0.0955 0">
+                <!-- <geom size="0.046 0.02" pos="0 0.08 0" quat="1 1 0 0" class="collision"/> -->
+                <body name="FL_thigh_2" pos="0 0.0955 0">
                     <inertial pos="-0.00374 -0.0223 -0.0327"
                         quat="0.829533 0.0847635 -0.0200632 0.551623" mass="1.152"
                         diaginertia="0.00594973 0.00584149 0.000878787" />
-                    <joint name="FL_thigh_joint" class="front_hip" />
+                    <joint name="FL_thigh_joint_2" class="front_hip" />
                     <geom mesh="thigh_0" material="metal" class="visual" />
                     <geom mesh="thigh_1" material="gray" class="visual" />
-                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
-                        quat="0.707107 0
-                    0.707107 0" class="collision" />
-                    <body name="FL_calf" pos="0 0 -0.213">
+                    <!-- <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955" quat="0.707107 0
+                    0.707107 0" class="collision"/> -->
+                    <body name="FL_calf_2" pos="0 0 -0.213">
                         <inertial pos="0.00629595 -0.000622121 -0.141417"
-                            quat="0.710672 0.00154099 -0.00450087 0.703508"
-                            mass="0.241352" diaginertia="0.0014901 0.00146356 5.31397e-05" />
-                        <joint name="FL_calf_joint" class="knee" />
+                            quat="0.710672 0.00154099 -0.00450087 0.703508" mass="0.241352"
+                            diaginertia="0.0014901 0.00146356 5.31397e-05" />
+                        <joint name="FL_calf_joint_2" class="knee" />
                         <geom mesh="calf_0" material="gray" class="visual" />
                         <geom mesh="calf_1" material="black" class="visual" />
-                        <geom size="0.012 0.06" pos="0.008 0 -0.06"
-                            quat="0.994493 0 -0.104807
-                        0" class="collision" />
-                        <geom size="0.011 0.0325" pos="0.02 0 -0.148"
-                            quat="0.999688 0
-                        0.0249974 0" class="collision" />
                         <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
-                        <geom name="FL" class="foot" />
-                        <site name="FL_foot" class="go2foot" />
+                        <geom name="FL_2" class="foot" />
+                        <site name="FL_foot_2" class="go2foot" />
                     </body>
+                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
+                        quat="0.707107 0 0.707107 0" class="collision" />
                 </body>
+                <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0"
+                    class="collision" />
             </body>
-            <body name="RR_hip" pos="-0.1934 -0.0465 0">
+            <body name="RR_hip_2" pos="-0.1934 -0.0465 0">
                 <inertial pos="0.0054 -0.00194 -0.000105" quat="0.499245 0.497014 0.498237 0.505462"
-                    mass="0.678"
-                    diaginertia="0.00088403 0.000596003 0.000479967" />
-                <joint name="RR_hip_joint" class="abduction" />
+                    mass="0.678" diaginertia="0.00088403 0.000596003 0.000479967" />
+                <joint name="RR_hip_joint_2" class="abduction" />
                 <geom mesh="hip_0" material="metal" class="visual"
                     quat="2.14617e-09 4.63268e-05 4.63268e-05 -1" />
                 <geom mesh="hip_1" material="gray" class="visual"
                     quat="2.14617e-09 4.63268e-05 4.63268e-05 -1" />
-                <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
-                    class="collision" />
-                <body name="RR_thigh" pos="0 -0.0955 0">
+                <!-- <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
+                class="collision"/> -->
+                <body name="RR_thigh_2" pos="0 -0.0955 0">
                     <inertial pos="-0.00374 0.0223 -0.0327"
                         quat="0.551623 -0.0200632 0.0847635 0.829533" mass="1.152"
                         diaginertia="0.00594973 0.00584149 0.000878787" />
-                    <joint name="RR_thigh_joint" class="back_hip" />
+                    <joint name="RR_thigh_joint_2" class="back_hip" />
                     <geom mesh="thigh_mirror_0" material="metal" class="visual" />
                     <geom mesh="thigh_mirror_1" material="gray" class="visual" />
-                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
-                        quat="0.707107 0
-                    0.707107 0" class="collision" />
-                    <body name="RR_calf" pos="0 0 -0.213">
+                    <!-- <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955" quat="0.707107 0
+                    0.707107 0" class="collision"/> -->
+                    <body name="RR_calf_2" pos="0 0 -0.213">
                         <inertial pos="0.00629595 0.000622121 -0.141417"
-                            quat="0.703508 -0.00450087 0.00154099 0.710672"
-                            mass="0.241352" diaginertia="0.0014901 0.00146356 5.31397e-05" />
-                        <joint name="RR_calf_joint" class="knee" />
+                            quat="0.703508 -0.00450087 0.00154099 0.710672" mass="0.241352"
+                            diaginertia="0.0014901 0.00146356 5.31397e-05" />
+                        <joint name="RR_calf_joint_2" class="knee" />
                         <geom mesh="calf_mirror_0" material="gray" class="visual" />
                         <geom mesh="calf_mirror_1" material="black" class="visual" />
-                        <geom size="0.013 0.06" pos="0.01 0 -0.06"
-                            quat="0.995004 0 -0.0998334
-                        0" class="collision" />
-                        <geom size="0.011 0.0325" pos="0.02 0 -0.148"
-                            quat="0.999688 0
-                        0.0249974 0" class="collision" />
                         <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
-                        <geom name="RR" class="foot" />
-                        <site name="RR_foot" class="go2foot" />
+                        <geom name="RR_2" class="foot" />
+                        <site name="RR_foot_2" class="go2foot" />
                     </body>
+                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
+                        quat="0.707107 0 0.707107 0" class="collision" />
                 </body>
+                <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0"
+                    class="collision" />
             </body>
-            <body name="RL_hip" pos="-0.1934 0.0465 0">
+            <body name="RL_hip_2" pos="-0.1934 0.0465 0">
                 <inertial pos="0.0054 0.00194 -0.000105" quat="0.505462 0.498237 0.497014 0.499245"
-                    mass="0.678"
-                    diaginertia="0.00088403 0.000596003 0.000479967" />
-                <joint name="RL_hip_joint" class="abduction" />
+                    mass="0.678" diaginertia="0.00088403 0.000596003 0.000479967" />
+                <joint name="RL_hip_joint_2" class="abduction" />
                 <geom mesh="hip_0" material="metal" class="visual" quat="4.63268e-05 0 1 0" />
                 <geom mesh="hip_1" material="gray" class="visual" quat="4.63268e-05 0 1 0" />
-                <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0"
-                    class="collision" />
-                <body name="RL_thigh" pos="0 0.0955 0">
+                <!-- <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0"
+                class="collision"/> -->
+                <body name="RL_thigh_2" pos="0 0.0955 0">
                     <inertial pos="-0.00374 -0.0223 -0.0327"
                         quat="0.829533 0.0847635 -0.0200632 0.551623" mass="1.152"
                         diaginertia="0.00594973 0.00584149 0.000878787" />
-                    <joint name="RL_thigh_joint" class="back_hip" />
+                    <joint name="RL_thigh_joint_2" class="back_hip" />
                     <geom mesh="thigh_0" material="metal" class="visual" />
                     <geom mesh="thigh_1" material="gray" class="visual" />
-                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
-                        quat="0.707107 0
-                    0.707107 0" class="collision" />
-                    <body name="RL_calf" pos="0 0 -0.213">
+                    <!-- <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955" quat="0.707107 0
+                    0.707107 0" class="collision"/> -->
+                    <body name="RL_calf_2" pos="0 0 -0.213">
                         <inertial pos="0.00629595 -0.000622121 -0.141417"
-                            quat="0.710672 0.00154099 -0.00450087 0.703508"
-                            mass="0.241352" diaginertia="0.0014901 0.00146356 5.31397e-05" />
-                        <joint name="RL_calf_joint" class="knee" />
+                            quat="0.710672 0.00154099 -0.00450087 0.703508" mass="0.241352"
+                            diaginertia="0.0014901 0.00146356 5.31397e-05" />
+                        <joint name="RL_calf_joint_2" class="knee" />
                         <geom mesh="calf_0" material="gray" class="visual" />
                         <geom mesh="calf_1" material="black" class="visual" />
-                        <geom size="0.013 0.06" pos="0.01 0 -0.06"
-                            quat="0.995004 0 -0.0998334
-                        0" class="collision" />
-                        <geom size="0.011 0.0325" pos="0.02 0 -0.148"
-                            quat="0.999688 0
-                        0.0249974 0" class="collision" />
                         <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
-                        <geom name="RL" class="foot" />
-                        <site name="RL_foot" class="go2foot" />
+                        <geom name="RL_2" class="foot" />
+                        <site name="RL_foot_2" class="go2foot" />
                     </body>
+                    <geom size="0.017 0.01225 0.017" pos="-0.015 0 -0.1955"
+                        quat="0.707107 0 0.707107 0" class="collision" />
                 </body>
+                <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0"
+                    class="collision" />
             </body>
         </body>
-
+        <body name="box" pos="0 0 0.32">
+            <camera name="track" pos="0.846 -1.465 0.916"
+                xyaxes="0.866 0.500 0.000 -0.171 0.296 0.940" mode="trackcom" />
+            <geom name="box_geom" type="box" size="0.1 0.15 0.1" rgba="0.8 0.3 0.3 1"
+                friction="1.0 0.005 0.0001" />
+            <inertial mass="1.0" pos="0 0 0" diaginertia="0.1 0.1 0.1" />
+            <joint name="box_free" type="free" />
+        </body>
+        <!-- add a base to lift the above box -->
+        <geom name="base" type="box" size="0.1 0.1 0.1" pos="0 0 0.1" />
+        <body name="setpoint_1" pos="0 0 0.27">
+            <joint name="setpoint_1_x" type="slide" pos="0 0 0.27" axis="1 0 0" />
+            <joint name="setpoint_1_y" type="slide" pos="0 0 0.27" axis="0 1 0" />
+            <geom size="0.1" type="sphere" class="visual" />
+        </body>
+        <body name="setpoint_2" pos="0 0 0.27">
+            <joint name="setpoint_2_x" type="slide" pos="0 0 0.27" axis="1 0 0" />
+            <joint name="setpoint_2_y" type="slide" pos="0 0 0.27" axis="0 1 0" />
+            <geom size="0.1" type="sphere" class="visual" />
+        </body>
     </worldbody>
-
     <actuator>
-        <motor class="abduction" name="FR_hip" joint="FR_hip_joint" />
-        <motor class="hip" name="FR_thigh" joint="FR_thigh_joint" />
-        <motor class="knee" name="FR_calf" joint="FR_calf_joint" />
-        <motor class="abduction" name="FL_hip" joint="FL_hip_joint" />
-        <motor class="hip" name="FL_thigh" joint="FL_thigh_joint" />
-        <motor class="knee" name="FL_calf" joint="FL_calf_joint" />
-        <motor class="abduction" name="RR_hip" joint="RR_hip_joint" />
-        <motor class="hip" name="RR_thigh" joint="RR_thigh_joint" />
-        <motor class="knee" name="RR_calf" joint="RR_calf_joint" />
-        <motor class="abduction" name="RL_hip" joint="RL_hip_joint" />
-        <motor class="hip" name="RL_thigh" joint="RL_thigh_joint" />
-        <motor class="knee" name="RL_calf" joint="RL_calf_joint" />
+        <motor class="abduction" name="FR_hip_1" joint="FR_hip_joint_1" />
+        <motor class="hip" name="FR_thigh_1" joint="FR_thigh_joint_1" />
+        <motor class="knee" name="FR_calf_1" joint="FR_calf_joint_1" />
+        <motor class="abduction" name="FL_hip_1" joint="FL_hip_joint_1" />
+        <motor class="hip" name="FL_thigh_1" joint="FL_thigh_joint_1" />
+        <motor class="knee" name="FL_calf_1" joint="FL_calf_joint_1" />
+        <motor class="abduction" name="RR_hip_1" joint="RR_hip_joint_1" />
+        <motor class="hip" name="RR_thigh_1" joint="RR_thigh_joint_1" />
+        <motor class="knee" name="RR_calf_1" joint="RR_calf_joint_1" />
+        <motor class="abduction" name="RL_hip_1" joint="RL_hip_joint_1" />
+        <motor class="hip" name="RL_thigh_1" joint="RL_thigh_joint_1" />
+        <motor class="knee" name="RL_calf_1" joint="RL_calf_joint_1" />
+        <motor class="abduction" name="FR_hip_2" joint="FR_hip_joint_2" />
+        <motor class="hip" name="FR_thigh_2" joint="FR_thigh_joint_2" />
+        <motor class="knee" name="FR_calf_2" joint="FR_calf_joint_2" />
+        <motor class="abduction" name="FL_hip_2" joint="FL_hip_joint_2" />
+        <motor class="hip" name="FL_thigh_2" joint="FL_thigh_joint_2" />
+        <motor class="knee" name="FL_calf_2" joint="FL_calf_joint_2" />
+        <motor class="abduction" name="RR_hip_2" joint="RR_hip_joint_2" />
+        <motor class="hip" name="RR_thigh_2" joint="RR_thigh_joint_2" />
+        <motor class="knee" name="RR_calf_2" joint="RR_calf_joint_2" />
+        <motor class="abduction" name="RL_hip_2" joint="RL_hip_joint_2" />
+        <motor class="hip" name="RL_thigh_2" joint="RL_thigh_joint_2" />
+        <motor class="knee" name="RL_calf_2" joint="RL_calf_joint_2" />
     </actuator>
-
     <!-- <sensor>
         <jointpos joint="FL_hip_joint" name="abduction_front_left_pos" />
         <jointpos joint="FL_thigh_joint" name="hip_front_left_pos" />
@@ -473,8 +475,14 @@
         <framelinvel objtype="site" objname="imu" name="global_linvel" />
         <frameangvel objtype="site" objname="imu" name="global_angvel" />
     </sensor> -->
-
     <keyframe>
-        <key name="home" qpos="0 0 0.27 1 0 0 0 0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8" />
+        <key name="home"
+            qpos="-0.5 0 0.27 1 0 0 0
+                0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8
+                0.5 0 0.27 0 0 0 1
+                0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8 0 0.9 -1.8
+                0 0 0.32 1 0 0 0
+                -0.6 0
+                0.6 0" />
     </keyframe>
 </mujoco>

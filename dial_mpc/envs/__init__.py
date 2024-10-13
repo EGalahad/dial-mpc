@@ -13,6 +13,8 @@ from dial_mpc.envs.unitree_go2_env import (
 )
 from .hierarchical_env import (
     Go2ForceEnvConfig,
+    Go2ForceTransportEnvConfig,
+    Go2VelocityTransportEnvConfig,
 )
 
 _configs = {
@@ -25,6 +27,8 @@ _configs = {
     "unitree_go2_slalom": UnitreeGo2SlalomEnvConfig,
     "unitree_go2_box_transport": UnitreeGo2TransportEnvConfig,
     "go2_force": Go2ForceEnvConfig,
+    "go2_force_transport": Go2ForceTransportEnvConfig,
+    "go2_vel_transport": Go2VelocityTransportEnvConfig,
 }
 
 
