@@ -17,6 +17,9 @@ from .hierarchical_env import (
     Go2VelocityTransportEnvConfig,
 )
 
+from .orca_env import OrcaWalkEnvConfig
+
+
 _configs = {
     "unitree_h1_walk": UnitreeH1WalkEnvConfig,
     "unitree_h1_push_crate": UnitreeH1PushCrateEnvConfig,
@@ -29,6 +32,7 @@ _configs = {
     "go2_force": Go2ForceEnvConfig,
     "go2_force_transport": Go2ForceTransportEnvConfig,
     "go2_vel_transport": Go2VelocityTransportEnvConfig,
+    "orca_walk": OrcaWalkEnvConfig,
 }
 
 
