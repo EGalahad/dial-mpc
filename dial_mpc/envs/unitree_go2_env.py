@@ -11,7 +11,8 @@ from brax import math
 import brax.base as base
 from brax.base import System
 from brax import envs as brax_envs
-from brax.envs.base import PipelineEnv, State
+from brax.envs.base import PipelineEnv
+from brax.envs.base import State as BraxBaseState
 from brax.mjx.base import State as PipelineState
 from brax.io import html, mjcf, model
 
@@ -107,9 +108,16 @@ class UnitreeGo2Env(BaseEnv):
         model_path = get_model_path("unitree_go2", "mjx_scene_force.xml")
         sys = mjcf.load(model_path)
         sys = sys.tree_replace({"opt.timestep": config.timestep})
+        sys = sys.tree_replace({
+          'opt.solver': mujoco.mjtSolver.mjSOL_NEWTON,
+          'opt.disableflags': mujoco.mjtDisableBit.mjDSBL_EULERDAMP,
+          'opt.iterations': 2,
+          'opt.ls_iterations': 4,
+        })
+
         return sys
 
-    def reset(self, rng: jax.Array) -> State:  # pytype: disable=signature-mismatch
+    def reset(self, rng: jax.Array) -> BraxBaseState:  # pytype: disable=signature-mismatch
         rng, key = jax.random.split(rng)
 
         pipeline_state = self.pipeline_init(self._init_q, jnp.zeros(self._nv))
@@ -131,10 +139,10 @@ class UnitreeGo2Env(BaseEnv):
         obs = self._get_obs(pipeline_state, state_info)
         reward, done = jnp.zeros(2)
         metrics = {}
-        state = State(pipeline_state, obs, reward, done, metrics, state_info)
+        state = BraxBaseState(pipeline_state, obs, reward, done, metrics, state_info)
         return state
 
-    def step(self, state: State, action: jax.Array) -> State:
+    def step(self, state: BraxBaseState, action: jax.Array) -> BraxBaseState:
         rng, cmd_rng = jax.random.split(state.info["rng"], 2)
 
         # physics step
@@ -144,6 +152,15 @@ class UnitreeGo2Env(BaseEnv):
         elif self._config.leg_control == "torque":
             ctrl = self.act2tau(action, state.pipeline_state)
         pipeline_state = self.pipeline_step(state.pipeline_state, ctrl)
+
+        # pipeline_state = state.pipeline_state
+        # def f(state):
+        #     return self._pipeline.step(self.sys, state, ctrl, self._debug)
+        # pipeline_state = f(pipeline_state)
+        # pipeline_state = f(pipeline_state)
+        # pipeline_state = f(pipeline_state)
+        # pipeline_state = f(pipeline_state)
+
         x, xd = pipeline_state.x, pipeline_state.xd
 
         # observation data
@@ -371,7 +388,7 @@ class UnitreeGo2SeqJumpEnv(UnitreeGo2Env):
             ]
         )
 
-    def reset(self, rng: jax.Array) -> State:
+    def reset(self, rng: jax.Array) -> BraxBaseState:
         rng, key = jax.random.split(rng)
         pipeline_state = self.pipeline_init(self._init_q, jnp.zeros(self._nv))
 
@@ -407,13 +424,13 @@ class UnitreeGo2SeqJumpEnv(UnitreeGo2Env):
         obs = self._get_obs(pipeline_state, state_info)
         reward, done = jnp.zeros(2)
         metrics = {}
-        state = State(pipeline_state, obs, reward, done, metrics, state_info)
+        state = BraxBaseState(pipeline_state, obs, reward, done, metrics, state_info)
 
         return state
 
     def step(
-        self, state: State, action: jax.Array
-    ) -> State:  # pytype: disable=signature-mismatch
+        self, state: BraxBaseState, action: jax.Array
+    ) -> BraxBaseState:  # pytype: disable=signature-mismatch
         rng, cmd_rng = jax.random.split(state.info["rng"], 2)
 
         # physics step
@@ -703,7 +720,7 @@ class UnitreeGo2SlalomEnv(UnitreeGo2Env):
         #         pole.rgba = [0.0, 0.0, 1.0, 1.0]
         return sys
 
-    def reset(self, rng: jax.Array) -> State:  # pytype: disable=signature-mismatch
+    def reset(self, rng: jax.Array) -> BraxBaseState:  # pytype: disable=signature-mismatch
         rng, key = jax.random.split(rng)
 
         pipeline_state = self.pipeline_init(self._init_q, jnp.zeros(self._nv))
@@ -727,10 +744,10 @@ class UnitreeGo2SlalomEnv(UnitreeGo2Env):
         obs = self._get_obs(pipeline_state, state_info)
         reward, done = jnp.zeros(2)
         metrics = {}
-        state = State(pipeline_state, obs, reward, done, metrics, state_info)
+        state = BraxBaseState(pipeline_state, obs, reward, done, metrics, state_info)
         return state
 
-    def step(self, state: State, action: jax.Array) -> State:
+    def step(self, state: BraxBaseState, action: jax.Array) -> BraxBaseState:
         rng, cmd_rng = jax.random.split(state.info["rng"], 2)
 
         # physics step
@@ -938,8 +955,8 @@ class UnitreeGo2CrateEnv(UnitreeGo2Env):
         return sys
 
     def step(
-        self, state: State, action: jax.Array
-    ) -> State:  # pytype: disable=signature-mismatch
+        self, state: BraxBaseState, action: jax.Array
+    ) -> BraxBaseState:  # pytype: disable=signature-mismatch
         rng, cmd_rng = jax.random.split(state.info["rng"], 2)
 
         # physics step
@@ -1055,7 +1072,7 @@ class UnitreeGo2CrateEnv(UnitreeGo2Env):
         )
         return state
 
-    def reset(self, rng: jax.Array) -> State:
+    def reset(self, rng: jax.Array) -> BraxBaseState:
         state = super().reset(rng)
         state.info["pos_tar"] = jnp.array([1.45, 0.0, 0.87])
         state.info["vel_tar"] = jnp.array([0.0, 0.0, 0.0])
@@ -1080,7 +1097,7 @@ class UnitreeGo2PushEnv(UnitreeGo2Env):
         sys = sys.tree_replace({"opt.timestep": config.timestep})
         return sys
 
-    def reset(self, rng: jax.Array) -> State:  # pytype: disable=signature-mismatch
+    def reset(self, rng: jax.Array) -> BraxBaseState:  # pytype: disable=signature-mismatch
         rng, key = jax.random.split(rng)
 
         pipeline_state = self.pipeline_init(self._init_q, jnp.zeros(self._nv))
@@ -1102,10 +1119,10 @@ class UnitreeGo2PushEnv(UnitreeGo2Env):
         obs = self._get_obs(pipeline_state, state_info)
         reward, done = jnp.zeros(2)
         metrics = {}
-        state = State(pipeline_state, obs, reward, done, metrics, state_info)
+        state = BraxBaseState(pipeline_state, obs, reward, done, metrics, state_info)
         return state
 
-    def step(self, state: State, action: jax.Array) -> State:
+    def step(self, state: BraxBaseState, action: jax.Array) -> BraxBaseState:
         rng, cmd_rng = jax.random.split(state.info["rng"], 2)
 
         # physics step
@@ -1344,7 +1361,7 @@ class UnitreeGo2TransportEnv(UnitreeGo2Env):
         )
         return tau
 
-    def reset(self, rng: jax.Array) -> State:  # pytype: disable=signature-mismatch
+    def reset(self, rng: jax.Array) -> BraxBaseState:  # pytype: disable=signature-mismatch
         rng, key = jax.random.split(rng)
 
         pipeline_state = self.pipeline_init(self._init_q, jnp.zeros(self._nv))
@@ -1366,10 +1383,10 @@ class UnitreeGo2TransportEnv(UnitreeGo2Env):
         obs = self._get_obs(pipeline_state, state_info)
         reward, done = jnp.zeros(2)
         metrics = {}
-        state = State(pipeline_state, obs, reward, done, metrics, state_info)
+        state = BraxBaseState(pipeline_state, obs, reward, done, metrics, state_info)
         return state
 
-    def step(self, state: State, action: jax.Array) -> State:
+    def step(self, state: BraxBaseState, action: jax.Array) -> BraxBaseState:
         rng, cmd_rng = jax.random.split(state.info["rng"], 2)
 
         # Physics step for both robots
@@ -1424,7 +1441,7 @@ class UnitreeGo2TransportEnv(UnitreeGo2Env):
         )
         return state
 
-    def _compute_reward(self, state: State, pipeline_state: PipelineState) -> jax.Array:
+    def _compute_reward(self, state: BraxBaseState, pipeline_state: PipelineState) -> jax.Array:
         x, xd = pipeline_state.x, pipeline_state.xd
         # gait reward for both robot
         z_feet_1 = pipeline_state.site_xpos[self._feet_site_id_1][:, 2]
@@ -1484,7 +1501,7 @@ class UnitreeGo2TransportEnv(UnitreeGo2Env):
         )
         return reward
 
-    def _compute_done(self, pipeline_state: PipelineState, state: State) -> jax.Array:
+    def _compute_done(self, pipeline_state: PipelineState, state: BraxBaseState) -> jax.Array:
         x = pipeline_state.x
         up = jnp.array([0.0, 0.0, 1.0])
 

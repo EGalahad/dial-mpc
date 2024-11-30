@@ -1,4 +1,5 @@
 from typing import Any, Dict, Sequence, Tuple, Union, List
+from .base_env import BaseEnv
 from dial_mpc.envs.unitree_h1_env import (
     UnitreeH1WalkEnvConfig,
     UnitreeH1PushCrateEnvConfig,
@@ -11,11 +12,11 @@ from dial_mpc.envs.unitree_go2_env import (
     UnitreeGo2SlalomEnvConfig,
     UnitreeGo2TransportEnvConfig,
 )
-from .hierarchical_env import (
-    Go2ForceEnvConfig,
-    Go2ForceTransportEnvConfig,
-    Go2VelocityTransportEnvConfig,
-)
+# from .hierarchical_env import (
+#     Go2ForceEnvConfig,
+#     Go2ForceTransportEnvConfig,
+#     Go2VelocityTransportEnvConfig,
+# )
 
 from .orca_env import OrcaWalkEnvConfig
 
@@ -29,9 +30,9 @@ _configs = {
     "unitree_go2_box_push": UnitreeGo2PushEnvConfig,
     "unitree_go2_slalom": UnitreeGo2SlalomEnvConfig,
     "unitree_go2_box_transport": UnitreeGo2TransportEnvConfig,
-    "go2_force": Go2ForceEnvConfig,
-    "go2_force_transport": Go2ForceTransportEnvConfig,
-    "go2_vel_transport": Go2VelocityTransportEnvConfig,
+    # "go2_force": Go2ForceEnvConfig,
+    # "go2_force_transport": Go2ForceTransportEnvConfig,
+    # "go2_vel_transport": Go2VelocityTransportEnvConfig,
     "orca_walk": OrcaWalkEnvConfig,
 }
 

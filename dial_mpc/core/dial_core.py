@@ -30,12 +30,14 @@ from dial_mpc.core.dial_config import DialConfig
 
 plt.style.use("science")
 
+jnp.set_printoptions(precision=2, linewidth=200)
 # Tell XLA to use Triton GEMM, this improves steps/sec by ~30% on some GPUs
 xla_flags = os.environ.get("XLA_FLAGS", "")
 xla_flags += " --xla_gpu_triton_gemm_any=True"
 os.environ["XLA_FLAGS"] = xla_flags
 
-jax.config.update("jax_disable_jit", True)
+# jax.config.update("jax_disable_jit", True)
+# jax.config.update("jax_debug_nans", True)
 
 
 def rollout_us(step_env, state, us):
@@ -138,6 +140,9 @@ class MBDPI:
         xbar = jnp.einsum("n,nijk->ijk", weights, xss)
 
         info = {
+            "state": state,
+            "us": us,
+            "Y0s": Y0s,
             "rews": rews,
             "qbar": qbar,
             "qdbar": qdbar,
@@ -247,20 +252,6 @@ def main():
     # Y0 = mbdpi.reverse(state_init, YN, rng_exp)
     Y0 = YN
 
-    setpoint_pos_b = jnp.array([1.0, 0.0, 0.0])
-    yaw_diff = jnp.array([0.0])
-    kp = jnp.array([6, 6, 6])
-    kd = jnp.array([4, 4, 4])
-    virtual_mass = jnp.array([1.])
-    cmd = jnp.concatenate([
-        setpoint_pos_b[:2],
-        yaw_diff,
-        kp[:2] * setpoint_pos_b[:2],
-        kd,
-        kp[2:] * yaw_diff,
-        virtual_mass,
-    ])
-
     Nstep = dial_config.n_steps
     rews = []
     rews_plan = []
@@ -271,12 +262,24 @@ def main():
     frames = []
     with tqdm(range(Nstep), desc="Rollout") as pbar:
         for t in pbar:
+            print(f"Step {t}")
             # forward single step
-            # state = step_env(state, Y0[0])
-            state = step_env(state, cmd)
+            state = step_env(state, Y0[0])
             rollout.append(state.pipeline_state)
             rews.append(state.reward)
             us.append(Y0[0])
+
+            if jnp.isnan(state.reward).any():
+                state_q = infos[-1]["state"].pipeline_state.q
+                state_qd = infos[-1]["state"].pipeline_state.qd
+                actions = infos[-1]["us"]
+                rewds = infos[-1]["rews"]
+                jnp.save("state_q.npy", state_q)
+                jnp.save("state_qd.npy", state_qd)
+                jnp.save("actions.npy", actions)
+                jnp.save("rews.npy", rewds)
+                breakpoint()
+                break
 
             if args.video:
                 mjx_data = mjx.get_data(env.sys.mj_model, state.pipeline_state)
@@ -295,6 +298,7 @@ def main():
             traj_diffuse_factors = (
                 dial_config.traj_diffuse_factor ** (jnp.arange(n_diffuse))[:, None]
             )
+            print("Performing Diffusion")
             (rng, Y0, _), info = jax.lax.scan(
                 reverse_scan, (rng, Y0, state), traj_diffuse_factors
             )
