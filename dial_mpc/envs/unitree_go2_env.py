@@ -228,13 +228,13 @@ class UnitreeGo2Env(BaseEnv):
             reward_gaits * 0.1
             + reward_air_time * 0.0
             + reward_pos * 0.0
-            + reward_upright * 0.5
-            + reward_yaw * 0.3
+            + reward_upright * 1.0
+            + reward_yaw * 0.5
             # + reward_pose * 0.0
             + reward_vel * 1.0
             + reward_ang_vel * 1.0
-            + reward_height * 1.0
-            + reward_energy * 0.00
+            + reward_height * 2.0
+            + reward_energy * 0.05
             + reward_alive * 0.0
         )
 
@@ -755,12 +755,12 @@ class UnitreeGo2CrateEnv(UnitreeGo2Env):
             contact_dist = pipeline_state.contact.dist[contact_idx]
             contact_pt = pipeline_state.contact.pos[contact_idx]
             cond = (
-                (contact_pt[0] > 1.0)
-                & (contact_pt[0] < 1.6)
+                (contact_pt[0] > 1.2)
+                & (contact_pt[0] < 2.0)
                 & (contact_pt[1] > -0.45)
                 & (contact_pt[1] < 0.45)
-                & (contact_pt[2] > 0.59)
-                & (contact_pt[2] < 0.61)
+                & (contact_pt[2] > 0.29)
+                & (contact_pt[2] < 0.31)
             )
             reward_contact += jax.lax.cond(cond, reward_1, reward_0, 1.0)
             penalty_contact = penalty_contact.at[i].set(penalty_contact[i] & (~cond))
@@ -769,16 +769,16 @@ class UnitreeGo2CrateEnv(UnitreeGo2Env):
         # reward
         reward = (
             reward_gaits * 0.0
-            + reward_pos * 0.5
+            + reward_pos * 5.0
             + reward_upright * 0.01
             + reward_yaw * 0.3
             # + reward_pose * 0.0
             + reward_vel * 0.0
-            + reward_height * 0.0
+            + reward_height * 0.5
             + reward_energy * 0.0000
             + reward_pitch * 0.0
             + reward_roll * 0.0
-            + reward_contact * 0.1
+            + reward_contact * 1.0
             - penalty_contact * 0.0
         )
         # jax.debug.print("{geom}", geom=pipeline_state.contact.geom)

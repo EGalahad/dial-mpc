@@ -20,3 +20,6 @@ class DialConfig:
     horizon_diffuse_factor: float = 0.9
     traj_diffuse_factor: float = 0.5  # factor to scale the sigma of trajectory diffuse
     update_method: str = "mppi"  # update method
+    
+    lr: float = 0.1
+    grad_clip: float = 1.0

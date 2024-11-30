@@ -3,8 +3,10 @@ examples = [
     "unitree_h1_push_crate",
     "unitree_h1_loco",
     "unitree_go2_trot",
+    "unitree_go2_trot_grad",
     "unitree_go2_seq_jump",
     "unitree_go2_crate_climb",
+    "unitree_go2_crate_climb_grad",
 ]
 
 deploy_examples = [
